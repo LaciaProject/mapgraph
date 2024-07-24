@@ -189,7 +189,6 @@ def method_check(
         if (key.startswith("__") and key.endswith("__")) or key.startswith("_"):
             continue
         if key not in dhp:
-            print(f"key {key} not in dhp")
             return False
         if not attribute_check(
             getattr(tp, key), getattr(etp, key), tp_mapping, ex_mapping
