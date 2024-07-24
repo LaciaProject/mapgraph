@@ -5,9 +5,14 @@ from dataclasses import dataclass
 from collections import deque
 
 from typing_extensions import get_args
-from typing_inspect import is_typevar
+from typing_inspect import is_typevar, is_generic_type, is_typevar, get_bound, get_constraints
 
-from ..type_utils import get_real_origin, generate_type, like_issubclass
+from ..type_utils import (
+    get_real_origin,
+    generate_type,
+    like_issubclass,
+    is_generic_protocol_type,
+)
 
 In = TypeVar("In", contravariant=True)
 
@@ -250,6 +255,30 @@ def check_typevar_model(
             check_typevar_model(i_sub_arg, template)
             for i_sub_arg in instance.args  # type: ignore
         )
+
+    if is_generic_protocol_type(template.origin):
+        ex_mapping = extract_typevar_mapping(
+            template.origin.__orig_bases__[0], template
+        )
+        if is_generic_type(instance.get_instance()):
+            tp_mapping = extract_typevar_mapping(
+                instance.origin.__orig_bases__[0], instance
+            )
+            return like_issubclass(
+                instance.origin, template.origin, tp_mapping, ex_mapping
+            )
+
+        return like_issubclass(instance.origin, template.origin, ex_mapping=ex_mapping)
+    elif is_typevar(template.origin):
+        bound = get_bound(template.origin)
+        if bound is not None:
+            if not check_typevar_model(instance.origin, bound):
+                return False
+        constraints = get_constraints(template.origin)
+        if constraints:
+            if not any(check_typevar_model(instance.origin, c) for c in constraints):
+                return False
+        return True
 
     if not like_issubclass(instance.origin, template.origin):
         return False

@@ -126,9 +126,11 @@ with local_context.scope():
 * 容器泛型 list[T]/dict[K, V]/...
 * Union 类型类型
 * Type 
+* TypeVar 类型变量
 * 泛型类 Generic[T]
 * Annotated/Field 注解类型
 * Protocol 协议类型
+* Protocol[T] 泛型协议类型
 * TypedDict 字典类型
 
 ### like_issubclass
@@ -137,5 +139,7 @@ with local_context.scope():
 * 容器泛型 list[T]/dict[K, V]
 * Union 类型类型
 * Type 
+* TypeVar 类型变量
 * 泛型类 Generic[T]
 * Protocol 协议类型
+* Protocol[T] 泛型协议类型

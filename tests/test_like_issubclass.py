@@ -1,11 +1,6 @@
 import pytest
 
-from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic
-from typing_extensions import Annotated, TypedDict
-
-from pydantic import Field
-
-# from mapgraph.type_utils import like_issubclass
+from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic, Iterable
 
 from mapgraph.typevar import check_typevar_model as like_issubclass
 
@@ -22,11 +17,33 @@ class ImplMyProtocol:
 
 # 新增泛型类
 T = TypeVar("T")
+V = TypeVar("V")
+K = TypeVar("K")
 
 
 class MyGenericClass(Generic[T]):
     def __init__(self, value: T):
         self.value = value
+
+
+class MyProtocolGeneric(Protocol[T, V]):
+    a: Iterable[dict[T, V]]
+
+    def output(self, value: T) -> T: ...
+
+
+class ImplMyProtocolClass:
+    a: list[dict[str, int]]
+
+    def output(self, value: str) -> str:
+        return value
+
+
+class ImplMyGeneric(Generic[T, K]):
+    a: list[dict[T, K]]
+
+    def output(self, value: T) -> T:
+        return value
 
 
 def test_like_issubclass():
@@ -60,15 +77,6 @@ def test_like_issubclass():
     assert like_issubclass(MyGenericClass[int], MyGenericClass)
     assert not like_issubclass(MyGenericClass[int], MyGenericClass[str])
 
-    # # Annotated测试
-    # AnnotatedStrField = Annotated[str, Field(description="A simple string")]
-    # AnnotatedStrIntField = Annotated[Union[str, int], Field(description="A string or integer")]
-    # AnnotatedIntField = Annotated[int, Field(description="A simple string", gt=1, lt=10)]
-
-    # assert like_issubclass(AnnotatedStrField, str)
-    # assert like_issubclass(AnnotatedStrIntField, Union)
-    # assert like_issubclass(AnnotatedIntField, int)
-
     # Protocol测试
     assert like_issubclass(ImplMyProtocol, MyProtocol)
 
@@ -83,6 +91,13 @@ def test_like_issubclass():
             return "not implementing"
 
     assert not like_issubclass(NotImplMyProtocol, MyProtocol)
+
+    # 泛型 Protocol 测试
+    assert like_issubclass(ImplMyProtocolClass, MyProtocolGeneric[str, int])
+    assert not like_issubclass(ImplMyProtocolClass, MyProtocolGeneric[int, str])
+
+    assert like_issubclass(ImplMyGeneric[int, str], MyProtocolGeneric[int, str])
+    assert not like_issubclass(ImplMyGeneric[str, int], MyProtocolGeneric[int, str])
 
 
 if __name__ == "__main__":

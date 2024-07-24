@@ -1,6 +1,5 @@
-from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic
+from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic, Iterable
 from typing_extensions import Annotated, TypedDict
-from dataclasses import dataclass
 
 import pytest
 from pydantic import Field
@@ -25,11 +24,33 @@ class MyTypedDict(TypedDict):
 
 # 新增泛型类
 T = TypeVar("T")
+V = TypeVar("V")
+K = TypeVar("K")
 
 
 class MyGenericClass(Generic[T]):
     def __init__(self, value: T):
         self.value = value
+
+
+class MyProtocolGeneric(Protocol[T, V]):
+    a: Iterable[dict[T, V]]
+
+    def output(self, value: T) -> T: ...
+
+
+class ImplMyProtocolClass:
+    a: list[dict[str, int]]
+
+    def output(self, value: str) -> str:
+        return value
+
+
+class ImplMyGeneric(Generic[T, K]):
+    a: list[dict[T, K]]
+
+    def output(self, value: T) -> T:
+        return value
 
 
 def test_like_isinstance():
@@ -103,6 +124,13 @@ def test_like_isinstance():
             return "not implementing"
 
     assert not like_isinstance(NotImplMyProtocol(), MyProtocol)
+
+    # 泛型 Protocol 测试
+    assert like_isinstance(ImplMyProtocolClass(), MyProtocolGeneric[str, int])
+    assert not like_isinstance(ImplMyProtocolClass(), MyProtocolGeneric[int, str])
+
+    assert like_isinstance(ImplMyGeneric[int, str](), MyProtocolGeneric[int, str])
+    assert not like_isinstance(ImplMyGeneric[str, int](), MyProtocolGeneric[int, str])
 
     # TypedDict测试
     valid_typed_dict_instance = {"key": "test", "value": 123}

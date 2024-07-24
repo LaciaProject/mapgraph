@@ -11,6 +11,7 @@ from typing import (
     runtime_checkable,
     Type,
     get_origin,
+    Optional,
 )
 from typing_extensions import get_type_hints
 from typing_inspect import get_generic_type
@@ -64,6 +65,10 @@ def is_protocol_type(tp):
     return hasattr(tp, "_is_protocol") and tp._is_protocol
 
 
+def is_generic_protocol_type(tp):
+    return is_protocol_type(tp) and tp.__parameters__
+
+
 def deep_type(obj, depth: int = 10, max_sample: int = -1):
     if depth <= 0:
         return get_generic_type(obj)
@@ -108,23 +113,44 @@ def deep_type(obj, depth: int = 10, max_sample: int = -1):
             return tuple
     else:
         res = get_generic_type(obj)
-        if res in (type, typing._GenericAlias): # type: ignore
+        if res in (type, typing._GenericAlias):  # type: ignore
             return Type[obj]
         return res
 
 
-def attribute_check(tp, etp):
+def attribute_check(
+    tp,
+    etp,
+    tp_mapping: Optional[dict] = None,
+    ex_mapping: Optional[dict] = None,
+):
+    from .typevar import check_typevar_model, gen_typevar_model
+
     htp = get_type_hints(tp, include_extras=True)
     hetp = get_type_hints(etp, include_extras=True)
+
     for key in hetp:
         if key not in htp:
             return False
-        if hetp[key] != htp[key]:
+        i, t = (
+            htp[key]
+            if tp_mapping is None
+            else gen_typevar_model(htp[key]).get_instance(tp_mapping),
+            hetp[key]
+            if ex_mapping is None
+            else gen_typevar_model(hetp[key]).get_instance(ex_mapping),
+        )
+        if not check_typevar_model(i, t):
             return False
     return True
 
 
-def method_check(tp, etp):
+def method_check(
+    tp,
+    etp,
+    tp_mapping: Optional[dict] = None,
+    ex_mapping: Optional[dict] = None,
+):
     dhp = tp.__dict__
     dehp = etp.__dict__
     for key in dehp:
@@ -132,16 +158,25 @@ def method_check(tp, etp):
             continue
         if key not in dhp:
             return False
-        if not attribute_check(dhp[key], dehp[key]):
+        if not attribute_check(dhp[key], dehp[key], tp_mapping, ex_mapping):
             return False
     return True
 
 
-def check_protocol_type(tp, expected_type, *, strict: bool = True):
+def check_protocol_type(
+    tp,
+    expected_type,
+    *,
+    strict: bool = True,
+    tp_mapping: Optional[dict] = None,
+    ex_mapping: Optional[dict] = None,
+):
     if not is_protocol_type(expected_type):
         raise TypeError(f"{expected_type} is not a protocol type")
     if strict:
-        return attribute_check(tp, expected_type) and method_check(tp, expected_type)
+        return attribute_check(
+            tp, expected_type, tp_mapping, ex_mapping
+        ) and method_check(tp, expected_type, tp_mapping, ex_mapping)
     return issubclass(tp, runtime_checkable(expected_type))
 
 
@@ -150,11 +185,11 @@ def generate_type(generic: Type[Any], instance: List[Type[Any]]):
         return Union[tuple(instance)]  # type: ignore
     elif Callable == generic:
         if len(instance) == 2:
-            return generic[instance[0], instance[1]] # type: ignore
+            return generic[instance[0], instance[1]]  # type: ignore
         return generic
     elif len(instance) == 0:
         return generic
-    return generic[tuple(instance)] # type: ignore
+    return generic[tuple(instance)]  # type: ignore
 
 
 def iter_type_args(tp):
@@ -170,13 +205,22 @@ def iter_type_args(tp):
                 yield from iter_type_args(arg)
 
 
-def like_issubclass(tp, expected_type):
+def like_issubclass(
+    tp,
+    expected_type,
+    tp_mapping: Optional[dict] = None,
+    ex_mapping: Optional[dict] = None,
+):
     if tp == expected_type or expected_type == Any:
         return True
     try:
-        if is_protocol_type(expected_type):
+        if is_generic_protocol_type(expected_type):
+            return check_protocol_type(
+                tp, expected_type, tp_mapping=tp_mapping, ex_mapping=ex_mapping
+            )
+        elif is_protocol_type(expected_type):
             return check_protocol_type(tp, expected_type)
-        if issubclass(tp, expected_type):
+        elif issubclass(tp, expected_type):
             return True
     except TypeError:
         if get_origin(tp) == expected_type:
@@ -186,21 +230,23 @@ def like_issubclass(tp, expected_type):
 
 def like_isinstance(obj, expected_type):
     from .typevar import check_typevar_model
+
     res = False
     try:
         t = TypeAdapter(expected_type)
         t.validate_python(obj, strict=True)
         res = True
-    except Exception as e:
+    except Exception:
         ...
     if res:
         return res
     if get_real_origin(expected_type) == Type:
         try:
             res = check_typevar_model(Type[obj], expected_type)
-        except Exception as e:
+        except Exception:
             ...
     if res:
         return res
     obj_type = deep_type(obj)
+
     return check_typevar_model(obj_type, expected_type)
