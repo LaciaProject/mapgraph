@@ -45,6 +45,8 @@ class ImplMyGeneric(Generic[T, K]):
     def output(self, value: T) -> T:
         return value
 
+class ImplMyGeneric2(ImplMyGeneric[int, str]):
+    ...
 
 def test_like_issubclass():
     # 常见类型测试
@@ -98,6 +100,9 @@ def test_like_issubclass():
 
     assert like_issubclass(ImplMyGeneric[int, str], MyProtocolGeneric[int, str])
     assert not like_issubclass(ImplMyGeneric[str, int], MyProtocolGeneric[int, str])
+
+    assert like_issubclass(ImplMyGeneric2, MyProtocolGeneric[int, str])
+    assert not like_issubclass(ImplMyGeneric2, MyProtocolGeneric[str, int])
 
 
 if __name__ == "__main__":

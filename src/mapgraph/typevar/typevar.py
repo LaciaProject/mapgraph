@@ -5,13 +5,14 @@ from dataclasses import dataclass
 from collections import deque
 
 from typing_extensions import get_args
-from typing_inspect import is_typevar, is_generic_type, is_typevar, get_bound, get_constraints
+from typing_inspect import is_typevar, is_generic_type, get_bound, get_constraints
 
 from ..type_utils import (
     get_real_origin,
     generate_type,
     like_issubclass,
     is_generic_protocol_type,
+    get_generic_mapping,
 )
 
 In = TypeVar("In", contravariant=True)
@@ -257,13 +258,9 @@ def check_typevar_model(
         )
 
     if is_generic_protocol_type(template.origin):
-        ex_mapping = extract_typevar_mapping(
-            template.origin.__orig_bases__[0], template
-        )
+        ex_mapping = get_generic_mapping(template.get_instance())
         if is_generic_type(instance.get_instance()):
-            tp_mapping = extract_typevar_mapping(
-                instance.origin.__orig_bases__[0], instance
-            )
+            tp_mapping = get_generic_mapping(instance.get_instance())
             return like_issubclass(
                 instance.origin, template.origin, tp_mapping, ex_mapping
             )

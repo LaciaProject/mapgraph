@@ -52,6 +52,8 @@ class ImplMyGeneric(Generic[T, K]):
     def output(self, value: T) -> T:
         return value
 
+class ImplMyGeneric2(ImplMyGeneric[int, str]):
+    ...
 
 def test_like_isinstance():
     # 常见类型测试
@@ -131,6 +133,10 @@ def test_like_isinstance():
 
     assert like_isinstance(ImplMyGeneric[int, str](), MyProtocolGeneric[int, str])
     assert not like_isinstance(ImplMyGeneric[str, int](), MyProtocolGeneric[int, str])
+
+    assert like_isinstance(ImplMyGeneric2(), MyProtocolGeneric[int, str])
+    assert not like_isinstance(ImplMyGeneric2(), MyProtocolGeneric[str, int])
+
 
     # TypedDict测试
     valid_typed_dict_instance = {"key": "test", "value": 123}

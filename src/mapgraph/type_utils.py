@@ -13,7 +13,7 @@ from typing import (
     get_origin,
     Optional,
 )
-from typing_extensions import get_type_hints
+from typing_extensions import get_type_hints, get_args
 from typing_inspect import get_generic_type
 
 
@@ -118,6 +118,39 @@ def deep_type(obj, depth: int = 10, max_sample: int = -1):
         return res
 
 
+def get_generic_mapping(cls):
+    # 用于存储最终的泛型变量和实际类型映射
+    final_mapping = {}
+
+    # 用于存储每一层的类型参数和实际类型的映射
+    local_mappings = []
+
+    def _resolve_generic(cls):
+        args = get_args(cls)
+        origin = get_origin(cls)
+
+        if not args and hasattr(cls, "__orig_bases__"):
+            # 如果类没有显式泛型参数，并且有原始基类，则解析原始基类
+            for base in cls.__orig_bases__:
+                _resolve_generic(base)
+        else:
+            type_vars = getattr(origin, "__parameters__", ())
+            local_mapping = dict(zip(type_vars, args))
+            local_mappings.append(local_mapping)
+
+            # 递归解析基类
+            for base in getattr(origin, "__orig_bases__", []):
+                _resolve_generic(base)
+
+    _resolve_generic(cls)
+
+    # 将各层映射整合到最终映射中
+    for mapping in reversed(local_mappings):
+        final_mapping.update(mapping)
+
+    return final_mapping
+
+
 def attribute_check(
     tp,
     etp,
@@ -128,7 +161,6 @@ def attribute_check(
 
     htp = get_type_hints(tp, include_extras=True)
     hetp = get_type_hints(etp, include_extras=True)
-
     for key in hetp:
         if key not in htp:
             return False
@@ -151,14 +183,17 @@ def method_check(
     tp_mapping: Optional[dict] = None,
     ex_mapping: Optional[dict] = None,
 ):
-    dhp = tp.__dict__
-    dehp = etp.__dict__
+    dhp = dir(tp)
+    dehp = dir(etp)
     for key in dehp:
-        if key.startswith("__") or key.startswith("_"):
+        if (key.startswith("__") and key.endswith("__")) or key.startswith("_"):
             continue
         if key not in dhp:
+            print(f"key {key} not in dhp")
             return False
-        if not attribute_check(dhp[key], dehp[key], tp_mapping, ex_mapping):
+        if not attribute_check(
+            getattr(tp, key), getattr(etp, key), tp_mapping, ex_mapping
+        ):
             return False
     return True
 
