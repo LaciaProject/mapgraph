@@ -3,7 +3,7 @@
 from typing import TypeVar, Generic
 from typing_extensions import Annotated
 
-from mapgraph.instance_of import InstanceOf, get_instance
+from mapgraph.instance_of import InstanceOf, get_instance, is_instance
 from mapgraph.context import InstanceContext
 from mapgraph.globals import GLOBAL_INSTANCE_CONTEXT
 
@@ -37,6 +37,7 @@ test = Test()
 assert test.a == "GLOBAL"
 assert test.b == 10
 assert get_instance(Obj[int]).a == 1
+assert is_instance(Obj[str]) is False
 
 with local_context.scope():
     assert test.a == 1
@@ -47,3 +48,4 @@ with local_context.scope():
         print(get_instance(dict[str, int]))
         print(get_instance(Obj).a)
         print(get_instance(Obj[int]).a)
+        assert is_instance(dict[str, int])

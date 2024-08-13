@@ -31,3 +31,6 @@ class InstanceOf(Generic[T]):
 
 def get_instance(target: Type[T] | Annotated) -> T:
     return INSTANCE_CONTEXT_VAR.get().get(target)
+
+def is_instance(target: Type[T] | Annotated) -> bool:
+    return INSTANCE_CONTEXT_VAR.get().is_target(target)

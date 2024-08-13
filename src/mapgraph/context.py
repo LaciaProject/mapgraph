@@ -4,6 +4,7 @@ import itertools
 from contextlib import contextmanager
 from typing import Any, cast, TypeVar, Type, Iterable, Iterator
 
+from .typevar import check_typevar_model
 from .type_utils import like_isinstance
 
 T = TypeVar("T")
@@ -39,7 +40,10 @@ class InstanceContext:
         raise KeyError(target)
 
     def is_target(self, target: Type[T]) -> bool:
-        return target in self.instances
+        for instance in self.instances:
+            if check_typevar_model(target, instance):
+                return True
+        return False
 
     @contextmanager
     def scope(self, *, inherit: bool = True):
