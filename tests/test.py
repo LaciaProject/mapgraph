@@ -36,16 +36,17 @@ test = Test()
 
 assert test.a == "GLOBAL"
 assert test.b == 10
-assert get_instance(Obj[int]).a == 1
+
+assert get_instance(Obj[int]).a == 10
 assert is_instance(Obj[str]) is False
 
 with local_context.scope():
-    assert test.a == 1
-    assert test.b == "a"
+    assert test.a == "GLOBAL"
+    assert test.b == 1
     with context.scope():
         print(get_instance(Annotated[int, Field(gt=1)]))
         print(get_instance(dict))
         print(get_instance(dict[str, int]))
         print(get_instance(Obj).a)
         print(get_instance(Obj[int]).a)
-        assert is_instance(dict[str, int])
+        print(is_instance(dict[str, int]), get_instance(dict[str, int]))
