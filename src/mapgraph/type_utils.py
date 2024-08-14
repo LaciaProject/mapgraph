@@ -290,5 +290,4 @@ def like_isinstance(obj, expected_type):
         return res
     
     obj_type = deep_type(obj)
-    print(obj, obj_type, expected_type)
     return check_typevar_model(obj_type, expected_type)
