@@ -221,6 +221,13 @@ def generate_type(generic: Type[Any], instance: List[Type[Any]]):
         if len(instance) == 2:
             return generic[instance[0], instance[1]]  # type: ignore
         return generic
+    elif Optional == generic:
+        NoneType = type(None)
+        non_none_types = [i for i in instance if i != NoneType]
+        if len(non_none_types) == 1:
+            return Optional[non_none_types[0]]  # type: ignore
+        else:
+            raise ValueError("Optional requires a single type.")
     elif len(instance) == 0:
         return generic
     return generic[tuple(instance)]  # type: ignore
@@ -281,6 +288,7 @@ def like_isinstance(obj, expected_type):
             ...
     if res:
         return res
+    
     obj_type = deep_type(obj)
-
+    print(obj, obj_type, expected_type)
     return check_typevar_model(obj_type, expected_type)

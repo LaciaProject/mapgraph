@@ -1,4 +1,4 @@
-from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic, Iterable
+from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic, Iterable, Optional
 from typing_extensions import Annotated, TypedDict
 
 import pytest
@@ -76,6 +76,11 @@ def test_like_isinstance():
     assert like_isinstance("hello", Union[int, str])
     assert like_isinstance(10, Union[int, str])
     assert not like_isinstance(10.5, Union[int, str])
+
+    # Optional类型测试
+    assert like_isinstance(None, Optional[int])
+    assert like_isinstance(10, Optional[int])
+    assert not like_isinstance("hello", Optional[int])
 
     # Type类型测试
     assert like_isinstance(int, Type[int])

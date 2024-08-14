@@ -161,6 +161,8 @@ def gen_typevar_model(invar: Type[In]):
     args = get_args(invar)
     if origin is None and args == ():
         return TypeVarModel(origin=invar)
+    elif origin is Optional:
+        origin = Union
     args_list = []
     for arg in args:
         if isinstance(arg, list):

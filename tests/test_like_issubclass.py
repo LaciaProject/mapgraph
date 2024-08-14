@@ -1,6 +1,6 @@
 import pytest
 
-from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic, Iterable
+from typing import List, Dict, Type, Union, TypeVar, Protocol, Generic, Iterable, Optional
 
 from mapgraph.typevar import check_typevar_model as like_issubclass
 
@@ -71,6 +71,12 @@ def test_like_issubclass():
     assert not like_issubclass(Union[int, str], Union[str, float])
     assert not like_issubclass(Union[int, str], List[int | str])
 
+    # Optional类型测试
+    assert like_issubclass(Optional[int], None | int)
+    assert like_issubclass(Optional[int], Optional[int | str])
+    assert not like_issubclass(Optional[int], Optional[str])
+    assert not like_issubclass(Optional[int], str | None)
+    
     # Type类型测试
     assert like_issubclass(Type[int], Type)
     assert not like_issubclass(Type[int], int)
