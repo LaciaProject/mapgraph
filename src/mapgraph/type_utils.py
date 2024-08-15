@@ -146,13 +146,16 @@ def get_generic_mapping(cls):
 
     # 将各层映射整合到最终映射中
     for mapping in reversed(local_mappings):
-        for k, v in mapping.items():
-            # 更新最终映射，确保泛型变量会映射到更具体的类型
-            while v in final_mapping:
-                v = final_mapping[v]
-            final_mapping[k] = v
+        final_mapping.update(mapping)
 
-    return final_mapping
+    res = {}
+    for k, v in final_mapping.items():
+        if v in final_mapping:
+            res[k] = final_mapping[v]
+        else:
+            res[k] = v
+
+    return res
 
 
 def attribute_check(
@@ -292,6 +295,6 @@ def like_isinstance(obj, expected_type):
             ...
     if res:
         return res
-    
+
     obj_type = deep_type(obj)
     return check_typevar_model(obj_type, expected_type)
