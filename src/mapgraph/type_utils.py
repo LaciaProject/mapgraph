@@ -146,7 +146,11 @@ def get_generic_mapping(cls):
 
     # 将各层映射整合到最终映射中
     for mapping in reversed(local_mappings):
-        final_mapping.update(mapping)
+        for k, v in mapping.items():
+            # 更新最终映射，确保泛型变量会映射到更具体的类型
+            while v in final_mapping:
+                v = final_mapping[v]
+            final_mapping[k] = v
 
     return final_mapping
 
