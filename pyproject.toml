@@ -1,6 +1,6 @@
 [project]
 name = "mapgraph"
-version = "0.1.7"
+version = "0.1.8"
 description = "一个便捷实用的上下文管理工具"
 authors = [
     {name = "luxuncang", email = "luxuncang@qq.com"},
