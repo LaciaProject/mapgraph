@@ -1,19 +1,35 @@
 [project]
 name = "mapgraph"
-version = "0.1.9"
-description = "一个便捷实用的上下文管理工具"
+version = "0.2.0"
+description = "一个强大的对象控制工具, 覆盖了配置管理、状态管理、上下文管理和生命周期管理。"
 authors = [
     {name = "luxuncang", email = "luxuncang@qq.com"},
 ]
 dependencies = [
-    "typing-inspect>=0.9.0",
-    "typing-extensions>=4.12.2",
-    "pydantic>=2.8.2",
+    "python-dotenv>=1.0.1",
+    "launart>=0.8.2",
+    "typing-tool>=0.1.0",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}
 
+[project.optional-dependencies]
+aiohttp = [
+    "aiohttp>=3.10.5",
+]
+httpx = [
+    "httpx>=0.27.2",
+]
+uvicorn = [
+    "uvicorn>=0.30.6",
+]
+starlette = [
+    "starlette>=0.38.4",
+]
+tortoise = [
+    "tortoise-orm>=0.21.6",
+]
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
