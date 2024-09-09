@@ -8,12 +8,16 @@ from .globals import INSTANCE_CONTEXT_VAR
 
 T = TypeVar("T")
 
+class _MISSING_TYPE:
+    pass
+MISSING = _MISSING_TYPE()
 
 class InstanceOfV(Generic[T]):
     target: Type[T]
 
-    def __init__(self, target: Type[T]) -> None:
+    def __init__(self, target: Type[T], default: T | Any = MISSING) -> None:
         self.target = target
+        self._default = default
 
     @overload
     def __get__(self, instance: None, owner: type) -> Self: ...
@@ -24,7 +28,13 @@ class InstanceOfV(Generic[T]):
     def __get__(self, instance: Any, owner: type):
         if instance is None:
             return self
-        return INSTANCE_CONTEXT_VAR.get().get_by_value(self.target)
+        try:
+            res =  INSTANCE_CONTEXT_VAR.get().get_by_value(self.target)
+            return res
+        except ValueError as e:
+            if self._default is not MISSING:
+                return self._default
+            raise e
 
     def __set__(self, instance: Any, value: T) -> None:
         if instance is None:
@@ -36,8 +46,9 @@ class InstanceOfV(Generic[T]):
 class InstanceOfK(Generic[T]):
     target: Type[T]
 
-    def __init__(self, target: Type[T]) -> None:
+    def __init__(self, target: Type[T], default: T | Any = MISSING) -> None:
         self.target = target
+        self._default = default
 
     @overload
     def __get__(self, instance: None, owner: type) -> Self: ...
@@ -48,7 +59,14 @@ class InstanceOfK(Generic[T]):
     def __get__(self, instance: Any, owner: type):
         if instance is None:
             return self
-        return INSTANCE_CONTEXT_VAR.get().get_by_key(self.target)
+        try:
+            res =  INSTANCE_CONTEXT_VAR.get().get_by_key(self.target)
+            return res
+        except KeyError as e:
+            if self._default is not MISSING:
+                return self._default
+            raise e
+
 
     def __set__(self, instance: Any, value: Mapping[Type[T], T]) -> None:
         if instance is None:
@@ -58,18 +76,18 @@ class InstanceOfK(Generic[T]):
 
 
 @overload
-def InstanceOf(target: Type[T], is_key: Literal[False]) -> InstanceOfV[T]: ...
+def InstanceOf(target: Type[T], is_key: Literal[False], default: T | Any = MISSING) -> InstanceOfV[T]: ...
 @overload
-def InstanceOf(target: Type[T], is_key: Literal[True]) -> InstanceOfK[T]: ...
+def InstanceOf(target: Type[T], is_key: Literal[True], default: T | Any = MISSING) -> InstanceOfK[T]: ...
 @overload
-def InstanceOf(target: Type[T], is_key: bool = False) -> InstanceOfV[T]: ...
+def InstanceOf(target: Type[T], is_key: bool = False, default: T | Any = MISSING) -> InstanceOfV[T]: ...
 
 def InstanceOf(
-    target: Type[T], is_key: bool = False
+    target: Type[T], is_key: bool = False, default: T | Any = MISSING
 ) -> InstanceOfV[T] | InstanceOfK[T]:
     if is_key:
-        return InstanceOfK[T](target)
-    return InstanceOfV[T](target)
+        return InstanceOfK[T](target, default=default)
+    return InstanceOfV[T](target, default=default)
 
 
 def get_instance(target: Type[T] | Annotated, is_key: bool = False) -> T:

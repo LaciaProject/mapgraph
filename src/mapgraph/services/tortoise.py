@@ -27,14 +27,11 @@ class StarletteASGIService(Service):
 
     @property
     def stages(self):
-        return {"preparing", "blocking", "cleanup"}
+        return {"preparing", "cleanup"}
 
     async def launch(self, manager: Launart) -> None:
         async with self.stage("preparing"):
             await Tortoise.init(self.config)
-
-        async with self.stage("blocking"):
-            await any_completed(manager.status.wait_for_sigexit())
 
         async with self.stage("cleanup"):
             await Tortoise.close_connections()
