@@ -275,4 +275,7 @@ print(config.data.d) # False
 
 ### 生命周期管理
 
-依赖于 [launart](https://github.com/GraiaProject/launart) [文档](https://graia.cn/other/launart/)
+目前可以使用两种实现
+
+* `mapgraph.lifecycle` 提供了 `launch_services` 服务自动编排
+* 依赖于 [launart](https://github.com/GraiaProject/launart) [文档](https://graia.cn/other/launart/)
