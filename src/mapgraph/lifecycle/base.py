@@ -5,7 +5,9 @@ from typing import Protocol, NewType, TypedDict, Literal
 
 class BaseService(Protocol):
     id: str
-    required: set[str]
+
+    @property
+    def required(self) -> set[str]: ...
 
     async def preparing(self) -> None: ...
 
