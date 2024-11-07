@@ -842,18 +842,18 @@ files = [
 
 [[package]]
 name = "typing-tool"
-version = "0.1.2"
+version = "0.1.5"
 requires_python = ">=3.10"
 summary = "python typing tool"
 groups = ["default"]
 dependencies = [
-    "pydantic>=2.8.2",
-    "typing-extensions>=4.12.2",
+    "pydantic>=2.7.0",
+    "typing-extensions>=4.11.0",
     "typing-inspect>=0.9.0",
 ]
 files = [
-    {file = "typing_tool-0.1.2-py3-none-any.whl", hash = "sha256:39375142aaed54e71e597fa4a93323ff42586d8567b4e52c5e75f815a04be262"},
-    {file = "typing_tool-0.1.2.tar.gz", hash = "sha256:9a1e16b523e0c7cb7ce4545ead7c3fe4f528518c36c8d79bd0df5afd18f927c6"},
+    {file = "typing_tool-0.1.5-py3-none-any.whl", hash = "sha256:c17eb2f877cd067c78454159a6987fb39a70f9f6929213bdf923c1f6b82c77b1"},
+    {file = "typing_tool-0.1.5.tar.gz", hash = "sha256:7a96670b779b07e5b7b0a409ae4b9283744c1166b5347c2abced647618c96784"},
 ]
 
 [[package]]

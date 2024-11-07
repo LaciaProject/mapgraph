@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import signal
-from typing import Iterable, List, Set
+from typing import Iterable, Optional
 
 import networkx as nx
 
@@ -38,10 +38,10 @@ def to_mermaid(graph: nx.DiGraph) -> str:
 
 def resolve_requirements(
     components: Iterable[BaseService], reverse: bool = False
-) -> List[Set[BaseService]]:
-    resolved_id: Set[str] = set()
-    unresolved: Set[BaseService] = set(components)
-    result: List[Set[BaseService]] = []
+) -> list[set[BaseService]]:
+    resolved_id: set[str] = set()
+    unresolved: set[BaseService] = set(components)
+    result: list[set[BaseService]] = []
     while unresolved:
         layer = {
             component for component in unresolved if resolved_id >= component.required
@@ -59,21 +59,21 @@ def resolve_requirements(
     return result
 
 
-async def launch_services(components: Iterable[BaseService]):
-    context = InstanceContext()
-    context.store({ServiceID(component.id): component for component in components})
+def get_all_services(components: Iterable[BaseService]) -> set[BaseService]:
+    services: set[BaseService] = set()
+    stack = list(components)
 
-    resolve_requirements(components)
+    while stack:
+        component = stack.pop()
+        if component not in services:
+            services.add(component)
+            if hasattr(component, "get_service"):
+                stack.extend(component.get_service())
 
-    loop = asyncio.get_running_loop()
-    stop_event = asyncio.Event()
+    return services
 
-    def signal_handler():
-        stop_event.set()
 
-    loop.add_signal_handler(signal.SIGINT, signal_handler)
-    loop.add_signal_handler(signal.SIGTERM, signal_handler)
-
+async def worker(context, components, stop_event):
     tasks = []
 
     try:
@@ -95,3 +95,41 @@ async def launch_services(components: Iterable[BaseService]):
         with context.scope():
             for layer in resolve_requirements(components, reverse=True):
                 await asyncio.gather(*(component.cleanup() for component in layer))
+
+
+async def launch_services(
+    components: Iterable[BaseService],
+    signals: Iterable[signal.Signals] = (signal.SIGINT, signal.SIGTERM),
+):
+    components = get_all_services(components)
+
+    context = InstanceContext()
+    context.store({ServiceID(component.id): component for component in components})
+
+    resolve_requirements(components)
+
+    loop = asyncio.get_running_loop()
+    stop_event = asyncio.Event()
+
+    def signal_handler():
+        stop_event.set()
+
+    for sig in signals:
+        loop.add_signal_handler(sig, signal_handler)
+
+    await worker(context, components, stop_event)
+
+
+def launch_services_sync(components: Iterable[BaseService]):
+    components = get_all_services(components)
+
+    context = InstanceContext()
+    context.store({ServiceID(component.id): component for component in components})
+
+    resolve_requirements(components)
+
+    stop_event = asyncio.Event()
+
+    asyncio.create_task(worker(context, components, stop_event))
+
+    return stop_event

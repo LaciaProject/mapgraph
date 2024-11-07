@@ -34,3 +34,6 @@ class UvicornService:
 
     async def cleanup(self) -> None:
         await self.server.shutdown()
+
+    def get_service(self):
+        return set()
