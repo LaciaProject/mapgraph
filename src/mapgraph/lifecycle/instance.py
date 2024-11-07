@@ -36,6 +36,12 @@ def to_mermaid(graph: nx.DiGraph) -> str:
     return "\n".join(lines)
 
 
+def show_to_mermaid(components: Iterable[BaseService]):
+    components = get_all_services(components)
+    graph = build_dependency_graph(components)
+    return to_mermaid(graph)
+
+
 def resolve_requirements(
     components: Iterable[BaseService], reverse: bool = False
 ) -> list[set[BaseService]]:
