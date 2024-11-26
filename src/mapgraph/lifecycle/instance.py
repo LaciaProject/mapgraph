@@ -85,7 +85,7 @@ async def worker(context, components, stop_event):
     try:
         with context.scope():
             for layer in resolve_requirements(components):
-                asyncio.gather(*(component.preparing() for component in layer))
+                await asyncio.gather(*(component.preparing() for component in layer))
             tasks.extend(
                 [asyncio.create_task(component.blocking()) for component in components]
             )

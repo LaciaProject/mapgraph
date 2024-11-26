@@ -275,7 +275,27 @@ print(config.data.d) # False
 
 ### 生命周期管理
 
-目前可以使用两种实现
-
 * `mapgraph.lifecycle` 提供了 `launch_services` 服务自动编排
-* 依赖于 [launart](https://github.com/GraiaProject/launart) [文档](https://graia.cn/other/launart/)
+
+```python
+class BaseService(Protocol):
+    id: str
+
+    @property
+    def required(self) -> set[str]: ...
+
+    async def preparing(self) -> None: ...
+
+    async def blocking(self) -> None: ...
+
+    async def cleanup(self) -> None: ...
+
+    def get_service(self) -> set[BaseService]: ...
+```
+
+* id: 服务的唯一标识符
+* required: 服务的依赖
+* preparing: 服务的准备阶段
+* blocking: 服务的阻塞阶段
+* cleanup: 服务的清理阶段
+* get_service: 获取服务的依赖

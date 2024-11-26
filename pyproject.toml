@@ -1,15 +1,15 @@
 [project]
 name = "mapgraph"
-version = "0.2.4"
+version = "0.2.5"
 description = "一个强大的对象控制工具, 覆盖了配置管理、状态管理、上下文管理和生命周期管理。"
 authors = [
     {name = "luxuncang", email = "luxuncang@qq.com"},
 ]
 dependencies = [
     "python-dotenv>=1.0.1",
-    "launart>=0.8.2",
     "typing-tool>=0.1.2",
     "networkx>=3.4.2",
+    "pyyaml>=6.0.2",
 ]
 requires-python = ">=3.10"
 readme = "README.md"
@@ -27,9 +27,6 @@ uvicorn = [
 ]
 starlette = [
     "starlette>=0.38.4",
-]
-tortoise = [
-    "tortoise-orm>=0.21.6",
 ]
 [build-system]
 requires = ["pdm-backend"]
