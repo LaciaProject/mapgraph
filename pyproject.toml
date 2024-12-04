@@ -1,6 +1,6 @@
 [project]
 name = "mapgraph"
-version = "0.2.5"
+version = "0.2.6"
 description = "一个强大的对象控制工具, 覆盖了配置管理、状态管理、上下文管理和生命周期管理。"
 authors = [
     {name = "luxuncang", email = "luxuncang@qq.com"},

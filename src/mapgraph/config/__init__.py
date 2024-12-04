@@ -24,9 +24,9 @@ def witch_type(value: str, _type):
     elif issubclass(_type, int):
         return int(value)
     elif issubclass(_type, dict):
-        return json.loads(value)
+        return json.loads(value) if isinstance(value, str) else value
     elif issubclass(_type, list):
-        return json.loads(value)
+        return json.loads(value) if isinstance(value, str) else value
     return value
 
 

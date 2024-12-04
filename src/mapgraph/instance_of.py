@@ -134,8 +134,8 @@ def InstanceOf(
     check_func: Optional[Callable[[Type[T], Type[T], T], bool]] = None,
 ) -> InstanceOfV[T] | InstanceOfK[T]:
     if is_key:
-        return InstanceOfK[T](target, default=default)
-    return InstanceOfV[T](target, default=default)
+        return InstanceOfK[T](target, default=default, check_func=check_func)
+    return InstanceOfV[T](target, default=default, check_func=check_func)
 
 
 def get_instance(
