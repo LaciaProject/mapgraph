@@ -154,3 +154,14 @@ def is_instance(
     return INSTANCE_CONTEXT_VAR.get().has_value(
         target, is_key=is_key, check_func=check_func
     )
+
+
+def set_instance(
+    target: Type[T] | Annotated,
+    value: T,
+    is_key: bool = False,
+) -> None:
+    if is_key:
+        INSTANCE_CONTEXT_VAR.get().store({target: value})
+    else:
+        INSTANCE_CONTEXT_VAR.get().store(value)
