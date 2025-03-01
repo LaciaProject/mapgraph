@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from typing import Protocol, NewType
+from contextlib import asynccontextmanager
+from typing import (
+    Protocol,
+    NewType,
+    TypeVar,
+)
+
+
+T = TypeVar("T")
 
 
 class BaseService(Protocol):
@@ -11,7 +19,9 @@ class BaseService(Protocol):
 
     async def preparing(self) -> None: ...
 
-    async def blocking(self) -> None: ...
+    @asynccontextmanager
+    async def blocking(self):
+        yield
 
     async def cleanup(self) -> None: ...
 

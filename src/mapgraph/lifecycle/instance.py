@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import signal
-from typing import Iterable, Optional
+from typing import Iterable
 
 import networkx as nx
 
@@ -79,28 +79,26 @@ def get_all_services(components: Iterable[BaseService]) -> set[BaseService]:
     return services
 
 
+async def wait_task(component, stop_event: asyncio.Event):
+    obj = component.blocking()
+    if hasattr(obj, "__aenter__") and hasattr(obj, "__aexit__"):
+        async with obj:
+            await stop_event.wait()
+    else:
+        await obj
+        await stop_event.wait()
+
+
 async def worker(context, components, stop_event):
     tasks = []
 
-    try:
-        with context.scope():
-            for layer in resolve_requirements(components):
-                await asyncio.gather(*(component.preparing() for component in layer))
-            tasks.extend(
-                [asyncio.create_task(component.blocking()) for component in components]
-            )
-
-        await stop_event.wait()
-
-    except asyncio.CancelledError:
-        pass
-
-    finally:
-        for task in tasks:
-            task.cancel()
-        with context.scope():
-            for layer in resolve_requirements(components, reverse=True):
-                await asyncio.gather(*(component.cleanup() for component in layer))
+    with context.scope():
+        for layer in resolve_requirements(components):
+            await asyncio.gather(*(component.preparing() for component in layer))
+        tasks.extend([wait_task(component, stop_event) for component in components])
+        await any_completed(*tasks)
+        for layer in resolve_requirements(components, reverse=True):
+            await asyncio.gather(*(component.cleanup() for component in layer))
 
 
 async def launch_services(
