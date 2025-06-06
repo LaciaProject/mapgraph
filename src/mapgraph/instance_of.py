@@ -146,6 +146,16 @@ def get_instance(
     return INSTANCE_CONTEXT_VAR.get().get(target, is_key=is_key, check_func=check_func)
 
 
+def iter_instances(
+    target: Type[T] | Annotated,
+    is_key: bool = False,
+    check_func: Optional[Callable[[Type[T], Type[T], T], bool]] = None,
+):
+    return INSTANCE_CONTEXT_VAR.get().get_all(
+        target, is_key=is_key, check_func=check_func
+    )
+
+
 def is_instance(
     target: Type[T] | Annotated,
     is_key: bool = False,

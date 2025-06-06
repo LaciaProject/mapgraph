@@ -32,7 +32,7 @@ class InstanceContext:
         check_func: Optional[Callable[[Type[T], Type[T], T], bool]] = None,
     ) -> T:
         if check_func is not None:
-            for key, value in self.instances.items():
+            for key, value in self.iter_items():
                 try:
                     y = check_func(target_type, key, value)
                 except Exception:
@@ -43,6 +43,44 @@ class InstanceContext:
         if is_key:
             return self.get_by_key(target_type)
         return self.get_by_value(target_type)
+
+    def get_all(
+        self,
+        target_type: Type[T],
+        is_key: bool = False,
+        check_func: Optional[Callable[[Type[T], Type[T], T], bool]] = None,
+    ):
+        """遍历出所有符合要求的值"""
+
+        if check_func is not None:
+            for key, value in self.iter_items(all_maps=True):
+                try:
+                    y = check_func(target_type, key, value)
+                except Exception:
+                    y = False
+                if y:
+                    yield cast(T, value)
+        elif is_key:
+            for key, value in self.iter_items(all_maps=True):
+                if like_issubclass(key, target_type):
+                    yield cast(T, value)
+        else:
+            for key, value in self.iter_items(all_maps=True):
+                if like_isinstance(value, target_type):
+                    yield cast(T, value)
+
+    def iter_items(self, all_maps: bool = False):
+        if all_maps:
+            if isinstance(self.instances, ChainMap):
+                for i in self.instances.maps:
+                    for key, value in i.items():
+                        yield key, value
+            else:
+                for key, value in self.instances.items():
+                    yield key, value
+        else:
+            for key, value in self.instances.items():
+                yield key, value
 
     def get_by_key(self, target_type: Type[T]) -> T:
         for key, value in self.instances.items():

@@ -2,10 +2,10 @@
 # It is not intended for manual editing.
 
 [metadata]
-groups = ["default", "aiohttp", "httpx", "starlette", "test", "tortoise", "uvicorn"]
+groups = ["default", "aiohttp", "httpx", "starlette", "test", "uvicorn"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:da20d48e1ea102414dfd142e87d8898424c988da68c7205a9f988778d78696e9"
+content_hash = "sha256:57c1932eed66b033db0add43042669fb33cac0a75096fd738625ac4d68ba150e"
 
 [[metadata.targets]]
 requires_python = ">=3.10"
@@ -115,25 +115,11 @@ files = [
 ]
 
 [[package]]
-name = "aiosqlite"
-version = "0.17.0"
-requires_python = ">=3.6"
-summary = "asyncio bridge to the standard sqlite3 module"
-groups = ["tortoise"]
-dependencies = [
-    "typing-extensions>=3.7.2",
-]
-files = [
-    {file = "aiosqlite-0.17.0-py3-none-any.whl", hash = "sha256:6c49dc6d3405929b1d08eeccc72306d3677503cc5e5e43771efc1e00232e8231"},
-    {file = "aiosqlite-0.17.0.tar.gz", hash = "sha256:f0e6acc24bc4864149267ac82fb46dfb3be4455f99fe21df82609cc6e6baee51"},
-]
-
-[[package]]
 name = "annotated-types"
 version = "0.7.0"
 requires_python = ">=3.8"
 summary = "Reusable constraint types to use with typing.Annotated"
-groups = ["default", "tortoise"]
+groups = ["default"]
 dependencies = [
     "typing-extensions>=4.0.0; python_version < \"3.9\"",
 ]
@@ -364,17 +350,6 @@ files = [
 ]
 
 [[package]]
-name = "iso8601"
-version = "2.1.0"
-requires_python = ">=3.7,<4.0"
-summary = "Simple module to parse ISO 8601 dates"
-groups = ["tortoise"]
-files = [
-    {file = "iso8601-2.1.0-py3-none-any.whl", hash = "sha256:aac4145c4dcb66ad8b648a02830f5e2ff6c24af20f4f482689be402db2429242"},
-    {file = "iso8601-2.1.0.tar.gz", hash = "sha256:6b1d3829ee8921c4301998c909f7829fa9ed3cbdac0d3b16af2d743aed1ba8df"},
-]
-
-[[package]]
 name = "multidict"
 version = "6.0.5"
 requires_python = ">=3.7"
@@ -554,7 +529,7 @@ name = "pydantic"
 version = "2.8.2"
 requires_python = ">=3.8"
 summary = "Data validation using Python type hints"
-groups = ["default", "tortoise"]
+groups = ["default"]
 dependencies = [
     "annotated-types>=0.4.0",
     "pydantic-core==2.20.1",
@@ -571,7 +546,7 @@ name = "pydantic-core"
 version = "2.20.1"
 requires_python = ">=3.8"
 summary = "Core functionality for Pydantic validation and serialization"
-groups = ["default", "tortoise"]
+groups = ["default"]
 dependencies = [
     "typing-extensions!=4.7.0,>=4.6.0",
 ]
@@ -636,17 +611,6 @@ files = [
 ]
 
 [[package]]
-name = "pypika-tortoise"
-version = "0.2.1"
-requires_python = "<4.0,>=3.7"
-summary = "Forked from pypika and streamline just for tortoise-orm"
-groups = ["tortoise"]
-files = [
-    {file = "pypika_tortoise-0.2.1-py3-none-any.whl", hash = "sha256:e91a1c5a78c6753ead1a9ba1aa169a1f1282c5035170e5462f0073564bc18886"},
-    {file = "pypika_tortoise-0.2.1.tar.gz", hash = "sha256:979bbb9d60fe9f6e4129a25c44ee008aab4a4e97b296350be9983dcaa2766354"},
-]
-
-[[package]]
 name = "pytest"
 version = "8.3.3"
 requires_python = ">=3.8"
@@ -674,16 +638,6 @@ groups = ["default"]
 files = [
     {file = "python-dotenv-1.0.1.tar.gz", hash = "sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca"},
     {file = "python_dotenv-1.0.1-py3-none-any.whl", hash = "sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a"},
-]
-
-[[package]]
-name = "pytz"
-version = "2024.1"
-summary = "World timezone definitions, modern and historical"
-groups = ["tortoise"]
-files = [
-    {file = "pytz-2024.1-py2.py3-none-any.whl", hash = "sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"},
-    {file = "pytz-2024.1.tar.gz", hash = "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812"},
 ]
 
 [[package]]
@@ -759,6 +713,17 @@ files = [
 ]
 
 [[package]]
+name = "statv"
+version = "0.3.2"
+requires_python = ">=3.8"
+summary = "a uniform status implementation for graia project"
+groups = ["default"]
+files = [
+    {file = "statv-0.3.2-py3-none-any.whl", hash = "sha256:32e430b21ab6a62695c67ab6cae3dba6e01e9c3fdbc9344e3236ad7a1f51d0c7"},
+    {file = "statv-0.3.2.tar.gz", hash = "sha256:fb4df2a37bf7a792e36a6e657c74cbdef9e2cdb8de3a0762b28b35c9e13f0fdd"},
+]
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 requires_python = ">=3.7"
@@ -771,29 +736,11 @@ files = [
 ]
 
 [[package]]
-name = "tortoise-orm"
-version = "0.21.7"
-requires_python = "<4.0,>=3.8"
-summary = "Easy async ORM for python, built with relations in mind"
-groups = ["tortoise"]
-dependencies = [
-    "aiosqlite<0.21.0,>=0.16.0",
-    "iso8601<3.0.0,>=2.1.0",
-    "pydantic!=2.7.0,<3.0,>=2.0",
-    "pypika-tortoise<0.3.0,>=0.2.1",
-    "pytz",
-]
-files = [
-    {file = "tortoise_orm-0.21.7-py3-none-any.whl", hash = "sha256:2229925885461f424673223ea1875bd5e6961384c766833af55a1ea11a9b25eb"},
-    {file = "tortoise_orm-0.21.7.tar.gz", hash = "sha256:8a790a931828aa37ac364b344c561e603422aced2af5e403f6790575da0f19c5"},
-]
-
-[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 requires_python = ">=3.8"
 summary = "Backported and Experimental Type Hints for Python 3.8+"
-groups = ["default", "httpx", "starlette", "tortoise", "uvicorn"]
+groups = ["default", "httpx", "starlette", "uvicorn"]
 files = [
     {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
     {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
